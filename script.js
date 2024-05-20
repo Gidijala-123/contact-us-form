@@ -23,6 +23,8 @@ function validateForm() {
   let generalEnquiry = document.getElementById("generalEnquiry");
   let supportRequest = document.getElementById("supportRequest");
   let exampleCheck1 = document.getElementById("exampleCheck1");
+  let exampleCheck1Label = exampleCheck1.nextElementSibling;
+  let radioContainers = document.querySelectorAll(".radio-container");
 
   var firstNameError = document.getElementById("firstNameError");
   var lastNameError = document.getElementById("lastNameError");
@@ -69,10 +71,15 @@ function validateForm() {
   if (!generalEnquiry.checked && !supportRequest.checked) {
     queryTypeError.innerText = "Please select a query type";
     queryTypeError.style.color = "red";
+    radioContainers.forEach((container) => {
+      container.style.borderColor = "red"; // Set border color to red for all radio containers
+    });
     isValid = false;
   } else {
-    generalEnquiry.closest(".radio-container").style.borderColor = "";
-    supportRequest.closest(".radio-container").style.borderColor = "";
+    queryTypeError.innerText = ""; // Clear any previous error message
+    radioContainers.forEach((container) => {
+      container.style.borderColor = ""; // Reset the border color for all radio containers
+    });
   }
 
   if (message.value.trim() === "") {
@@ -85,10 +92,10 @@ function validateForm() {
   }
 
   if (!exampleCheck1.checked) {
-    exampleCheck1.nextElementSibling.style.color = "red";
+    exampleCheck1Label.style.color = "red";
     isValid = false;
   } else {
-    exampleCheck1.nextElementSibling.style.color = "black";
+    exampleCheck1Label.style.color = "black";
   }
 
   return isValid;
@@ -98,5 +105,26 @@ function validateForm() {
 function resetValidation(element) {
   element.style.borderColor = "";
   let errorMessage = element.nextElementSibling;
-  errorMessage.innerText = "";
+  if (errorMessage && errorMessage.tagName === "SPAN") {
+    errorMessage.innerText = "";
+  }
+  if (element.type === "checkbox") {
+    let label = element.nextElementSibling;
+    if (label) {
+      label.style.color = element.checked ? "black" : "red";
+    }
+  }
 }
+
+// Attach the resetValidation function to inputs for real-time validation feedback
+document.querySelectorAll("input").forEach((input) => {
+  input.addEventListener("focus", function () {
+    resetValidation(this);
+  });
+
+  if (input.type === "checkbox") {
+    input.addEventListener("change", function () {
+      resetValidation(this);
+    });
+  }
+});
